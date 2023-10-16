@@ -10,7 +10,7 @@ const io = new Server(server, {
   connectionStateRecovery: {}
 })
 
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
   console.log('a user connected')
 
   socket.on('disconnect', () => {
@@ -31,6 +31,22 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg)
     io.emit('chat message', msg, result.lastInsertRowid.toString())
   })
+
+  console.log(socket.handshake.auth)
+
+  if (!socket.recovered) {
+    try {
+      const result = await db.execute({
+        sql: 'SELECT id, content FROM messages WHERE id > ?',
+        args: [socket.handshake.auth.serverOffset ?? 0]
+      })
+      result.rows.forEach((row) => {
+        socket.emit('chat message', row.content, row.id.toString())
+      })
+    } catch (error) {
+      console.log('🚀 ~ file: index.js:39 ~ io.on ~ error:', error)
+    }
+  }
 })
 
 const db = createClient({

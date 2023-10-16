@@ -5,12 +5,13 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch ./server/index.js"
+    "dev": "node --watch --env-file=dev.env ./server/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@libsql/client": "0.3.5",
     "express": "4.18.2",
     "morgan": "1.10.0",
     "socket.io": "4.7.2"
